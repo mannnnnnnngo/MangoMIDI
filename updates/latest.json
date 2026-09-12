@@ -1,0 +1,10 @@
+{
+  "version": "1.0.0",
+  "build": 10000,
+  "publishedAt": "2026-09-12",
+  "minimumSystemVersion": "15.0",
+  "notes": "First release. Transcribes a song into a piano MIDI score by searching while it plays, and hands finished scores to DynamicMango.",
+  "downloadURL": "https://github.com/mannnnnnnngo/MangoMIDI/releases/download/v1.0.0/mango-midi-1.0.0.dmg",
+  "sha256": "",
+  "releasePage": "https://github.com/mannnnnnnngo/MangoMIDI/releases/tag/v1.0.0"
+}
