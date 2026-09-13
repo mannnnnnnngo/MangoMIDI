@@ -1,22 +1,20 @@
 <div align="center">
 
-<img src="Icon/mangomidi.png" width="140" alt="Mango MIDI icon">
+<img src="mangomidi.png" width="140" alt="Mango MIDI icon">
 
 # 🥭 Mango MIDI
 
 **Turns a song into a piano MIDI score by transcribing it over and over *while it plays*, keeping whichever attempt best explains the recording.**
-
-*An app for piano players who want the sheet music but are broke — lwk me 🥲*
 
 Made by Mingyu 🧑‍💻
 
 <br>
 
 ![macOS](https://img.shields.io/badge/macOS-15%2B-202020?style=for-the-badge&logo=apple&logoColor=white)
+![Swift](https://img.shields.io/badge/Swift-SwiftUI%20%2B%20CoreML-FA7343?style=for-the-badge&logo=swift&logoColor=white)
 ![Version](https://img.shields.io/badge/version-1.0.0-7C5CFF?style=for-the-badge)
 ![Status](https://img.shields.io/badge/status-in%20development-F59E0B?style=for-the-badge)
 ![Price](https://img.shields.io/badge/price-free-2EA043?style=for-the-badge)
-![Privacy](https://img.shields.io/badge/data%20sent%20anywhere-none-0EA5E9?style=for-the-badge)
 
 </div>
 
@@ -25,7 +23,7 @@ Made by Mingyu 🧑‍💻
 > [!WARNING]
 > **Mango MIDI is in development.** 🚧 The search itself is built and measured — the numbers below are
 > from real runs, not estimates — but this is not a finished app you install and forget. Expect rough
-> edges in the window, and expect the command line to be the honest interface for a while yet.
+> edges in the window, and expect the CLI to be the honest interface for a while yet.
 
 > [!NOTE]
 > **Everything happens on your Mac.** 🔒 The model runs locally through CoreML, the audio never leaves
@@ -40,7 +38,7 @@ Made by Mingyu 🧑‍💻
 | [🎹 What it does](#-what-it-does) | [📥 Install](#-install) | [👀 Using it](#-using-it) |
 | [⌨️ The command line](#️-the-command-line) | [🔁 Why the loop exists](#-why-the-loop-exists) | [🥁 Background noise is not piano](#-background-noise-is-not-piano) |
 | [📊 What it scores](#-what-it-scores) | [♻️ Never doing a song twice](#️-never-doing-a-song-twice) | [🤝 Handing scores to DynamicMango](#-handing-scores-to-dynamicmango) |
-| [🗂️ Where things live](#️-where-things-live) | [🔔 Updates](#-updates) | [⚖️ Licence](#️-licence) |
+| [🗂️ Where things live](#️-where-things-live) | [🧱 Source layout](#-source-layout) | [⚖️ Licence](#️-licence) |
 
 ---
 
@@ -59,20 +57,22 @@ is playing.
 
 ## 📥 Install
 
-Grab the `.dmg` from **[the Releases page](https://github.com/mannnnnnnngo/MangoMIDI/releases)**, open
-it, and drag **Mango MIDI** onto Applications. Needs macOS 15 or newer.
+```bash
+./make_signing_cert.sh   # once
+./build_app.sh
+```
 
-> [!NOTE]
-> Mango MIDI is still in development, so there may not be a build on that page yet. 🚧
+Installs **Mango MIDI.app** into `/Applications`. Needs Apple's command line tools
+(`xcode-select --install`) and macOS 15+.
 
 > [!IMPORTANT]
-> The first time you open it, macOS blocks it — the app isn't signed with a paid Apple developer
-> account. Double-click Mango MIDI, press **Done** on the warning, then go to
-> **&#63743; → System Settings → Privacy & Security**, scroll to the bottom, and press **Open Anyway**.
-> Press **Open Anyway** once more to confirm. You only do this once. 🔓
+> Run `make_signing_cert.sh` first and it genuinely matters. Ad-hoc signatures get a new code hash on
+> every build, and macOS treats a changed hash as a different app — so every rebuild would drop the
+> audio permissions and re-prompt. A stable self-signed identity fixes that permanently. 🔏
 
-Mango MIDI needs permission to record audio, since listening to what is playing is the entire point.
-macOS asks the first time you press play. 🎧
+This is a **real compile**: Swift has no thin-shim option, so editing source means rebuilding.
+`VERSION` is the single source of truth for the version number, and the build refuses to run if
+`Core/Version.swift` has drifted from it.
 
 ---
 
@@ -90,8 +90,8 @@ When the player cannot be identified it falls back to tapping everything making 
 
 ## ⌨️ The command line
 
-The command line is not a convenience. It is how the transcription is measured, and every number in
-this README came out of it.
+The CLI is not a convenience. It is how the transcription is measured, and every number in this README
+came out of it.
 
 ```bash
 /Applications/Mango\ MIDI.app/Contents/MacOS/MangoMIDI --help
@@ -116,14 +116,15 @@ this README came out of it.
 
 ## 🔁 Why the loop exists
 
-One search runs over a finished recording against a time budget. The other runs *during* the song and
-never stops of its own accord — the song ending is what ends it, not a budget. Every round makes
-another batch of candidates, scores them, and keeps whichever explains the recording best.
+`Refiner` searches a finished recording against a budget. `LiveRefiner` runs the same search *during*
+the song and never stops of its own accord — the song ending is what ends it, not a budget. Every round
+makes another batch of candidates, scores them, and keeps whichever explains the recording best.
 
 Two things make an attempt cheap enough to repeat indefinitely:
 
-- **Inference runs once per moment of audio, ever.** The audio heard so far is kept along with the
-  model's opinions about it; a candidate is a re-decode of those activations, which is microseconds.
+- **Inference runs once per moment of audio, ever.** `LiveTranscriber` keeps the audio heard so far and
+  accumulates the model's opinions about it; a candidate is a re-decode of those activations, which is
+  microseconds.
 - **An attempt is scored over one excerpt**, twenty seconds or so, rather than over the whole piece —
   and the excerpt chosen is the stretch the current transcription explains *worst*. Attempts cost a
   twentieth as much, and are spent where the transcription is actually wrong.
@@ -146,17 +147,17 @@ anything.
 
 The transcription model is a *pitch* model, not a piano model: anything with energy at a pitch becomes
 a note. Worse, a struck transient has energy at **every** pitch at once, which is precisely what an
-onset detector fires on — so one snare hit can produce a dozen notes spread across the keyboard.
+onset head fires on — so one snare hit can produce a dozen notes spread across the keyboard.
 
 The spectral objective cannot fix this, and it looks as though it should. It asks how much of the
 recording a candidate explains, and a note placed on a drum hit *does* explain energy that is genuinely
 there.
 
-So a second test asks a different question: does the recording contain this note's **harmonic series**
-where the note is claimed? For the first few partials it measures what fraction of the surrounding
-fifth that partial is louder than — a rank, so it is scale-free, and a broadband strike lands at ~0.5
-by construction because it raises every bin together. Notes below the threshold are dropped *before*
-scoring, so the search optimises the transcription that will actually be saved.
+`Audio/NoteSupport.swift` asks a different question: does the recording contain this note's **harmonic
+series** where the note is claimed? For the first few partials it measures what fraction of the
+surrounding fifth that partial is louder than — a rank, so it is scale-free, and a broadband strike
+lands at ~0.5 by construction because it raises every bin together. Notes below the threshold are
+dropped *before* scoring, so the search optimises the transcription that will actually be saved.
 
 Calibrated with `--support-sweep`, which decodes once and applies each threshold to the same notes so
 the search cannot confound the sweep. Both fixtures peak at 0.92:
@@ -212,7 +213,7 @@ Coming back to a song has three outcomes, and one of them is doing nothing:
 | heard end to end, short of the target | carry on from the stored capture — no tap, no player needed |
 | only part of it was heard | listen again, with the search *seeded* from the settings it had reached |
 
-"Complete" means **the whole piece was heard**, not that the search is over. Those are separate facts,
+`complete` means **the whole piece was heard**, not that the search is over. Those are separate facts,
 and conflating them loses the ability to resume. Changing songs mid-search writes the partial result
 out first, so work is never thrown away.
 
@@ -220,7 +221,7 @@ out first, so work is never thrown away.
 
 ## 🤝 Handing scores to DynamicMango
 
-Each finished `.mid` and an index are written into a folder
+`Persist/Handoff.swift` writes each finished `.mid` and an index into a folder
 [DynamicMango](https://github.com/mannnnnnnngo/DynamicMango) reads
 (`~/Library/Application Support/DynamicMango/Scores` by default, plus any extra folders in the config).
 DynamicMango reads it on a track change, and **a delivered score replaces DynamicMango's own
@@ -241,26 +242,61 @@ evidence has to win outright, or there was no point fetching it.
 | `~/Documents/Mango MIDI/<track>/` | 🎼 One folder per track: the `.mid`, the record, the stored capture |
 | `~/Library/Application Support/DynamicMango/Scores` | 🤝 The handoff folder DynamicMango reads |
 
-Nothing lives in this repository. Transcriptions are recordings of what you were listening to, so they
-stay on your Mac. 🔒
+Nothing in this repository. Transcriptions are recordings of what you were listening to, so `Scores/`
+and every `.mid` are in `.gitignore` on purpose. 🔒
 
 ---
 
-## 🔔 Updates
+## 🧱 Source layout
 
-Mango MIDI checks [`updates/latest.json`](updates/latest.json) on this repository and tells you when a
-newer version is out. That is the only network request it makes, it carries nothing about you, and the
-download is whatever is attached to the matching release. 📡
+Each layer is replaceable without touching the others, and the dependency arrow only ever points
+downward:
+
+```
+UI/          resizable roll, transport, export            (SwiftUI, knows nothing about CoreML)
+   ↑
+Persist/     ~/Documents/Mango MIDI/<track>/              (files; no audio, no model)
+             the handoff folder DynamicMango reads
+   ↑
+Transcribe/  the continuous search, candidate scoring     (the search — the actual product)
+   ↑
+Audio/       decode, resample, render, spectral distance  (pure DSP over Float arrays)
+   ↑
+Core/        Score, Note, MIDI file writer, fingerprint   (no platform import at all)
+```
+
+`Acquire/` sits beside `Audio/` rather than under it: getting hold of the samples (a file, or a live
+process tap) is a different problem from what is done with them afterwards.
+
+> [!IMPORTANT]
+> **`Core/` has no `import AVFoundation` and no `import CoreML`.** The score model, the MIDI writer and
+> the scoring maths are all testable with no audio device and no model — which is what makes the search
+> checkable at all. `--self-test` is exactly that check.
+
+| 📄 File | Purpose |
+| --- | --- |
+| `Transcribe/LiveRefiner.swift` | The search that runs while the song plays, and the challenger rule |
+| `Transcribe/LiveTranscriber.swift` | Accumulated activations — inference once per moment of audio, ever |
+| `Audio/SpectralDistance.swift` | The objective: how much of the recording a candidate explains |
+| `Audio/NoteSupport.swift` | The harmonic-series test that keeps drums from becoming notes |
+| `Core/MIDIFile.swift` | The writer, testable with no audio at all |
+| `Core/Fingerprint.swift` | Recognising a piece by its audio rather than its title |
+| `Persist/Handoff.swift` | The contract with DynamicMango |
+| `Acquire/ProcessTap.swift` | Tapping the player's own process rather than the whole system |
+
+Third-party: [basic-pitch](https://github.com/spotify/basic-pitch) in `third_party/`, vendored with its
+licence and the commit it came from.
 
 ---
 
 ## ⚖️ Licence
 
-Mango MIDI is **free to use** but **not open source**. It may not be redistributed, modified, resold,
-reverse engineered, or presented as anyone else's work. The full terms are in [`LICENSE`](LICENSE).
+Mango MIDI is **free to use** but **not open source**. The source is published here to be read, not
+reused: it may not be redistributed, resold, built upon, or presented as anyone else's work. The full
+terms are in [`LICENSE`](LICENSE).
 
-Mango MIDI uses [basic-pitch](https://github.com/spotify/basic-pitch) for note detection. That is not
-mine and is not covered by the above — it carries its own licence.
+`third_party/` is not mine and is not covered by that — each component carries its own licence beside
+it.
 
 Copyright © 2026 Mingyu. All rights reserved.
 
@@ -270,6 +306,8 @@ Copyright © 2026 Mingyu. All rights reserved.
 
 **Made with 🥭 by Mingyu**
 
-🆓 Free forever · 🔒 Nothing leaves your Mac · 🎹 For broke pianists
+🚧 In development · 🔒 Everything runs on your Mac · 🎹 Feeds [DynamicMango](https://github.com/mannnnnnnngo/DynamicMango)
+
+Part of [🥭 MangoApps](https://github.com/mannnnnnnngo/MangoApps)
 
 </div>
