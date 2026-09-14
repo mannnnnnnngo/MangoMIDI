@@ -12,7 +12,7 @@ Made by Mingyu 🧑‍💻
 
 ![macOS](https://img.shields.io/badge/macOS-15%2B-202020?style=for-the-badge&logo=apple&logoColor=white)
 ![Swift](https://img.shields.io/badge/Swift-SwiftUI%20%2B%20CoreML-FA7343?style=for-the-badge&logo=swift&logoColor=white)
-![Version](https://img.shields.io/badge/version-1.0.0-7C5CFF?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-1.1.0-7C5CFF?style=for-the-badge)
 ![Status](https://img.shields.io/badge/status-in%20development-F59E0B?style=for-the-badge)
 ![Price](https://img.shields.io/badge/price-free-2EA043?style=for-the-badge)
 
@@ -38,7 +38,8 @@ Made by Mingyu 🧑‍💻
 | [🎹 What it does](#-what-it-does) | [📥 Install](#-install) | [👀 Using it](#-using-it) |
 | [⌨️ The command line](#️-the-command-line) | [🔁 Why the loop exists](#-why-the-loop-exists) | [🥁 Background noise is not piano](#-background-noise-is-not-piano) |
 | [📊 What it scores](#-what-it-scores) | [♻️ Never doing a song twice](#️-never-doing-a-song-twice) | [🤝 Handing scores to DynamicMango](#-handing-scores-to-dynamicmango) |
-| [🗂️ Where things live](#️-where-things-live) | [🧱 Source layout](#-source-layout) | [⚖️ Licence](#️-licence) |
+| [🗂️ Where things live](#️-where-things-live) | [🕶️ Privacy](#️-privacy) | [🆕 What's new in 1.1.0](#-whats-new-in-110) |
+| [🧱 Source layout](#-source-layout) | [⚖️ Licence](#️-licence) | |
 
 ---
 
@@ -57,13 +58,21 @@ is playing.
 
 ## 📥 Install
 
+Download **`mangomidi-1.1.0.dmg`** from the
+[latest release](https://github.com/mannnnnnnngo/MangoMIDI/releases/latest), drag the mango onto
+Applications, then **right-click Mango MIDI → Open** the first time. That step matters — the app
+isn't signed with a paid Apple developer account, and right-click → Open is Apple's own way past
+the warning. You only do it once. macOS 15+.
+
+### Building it yourself
+
 ```bash
 ./make_signing_cert.sh   # once
-./build_app.sh
+./build_app.sh           # builds and installs to /Applications
+./package.sh             # builds and wraps it in dist/mangomidi-<version>.dmg
 ```
 
-Installs **Mango MIDI.app** into `/Applications`. Needs Apple's command line tools
-(`xcode-select --install`) and macOS 15+.
+Needs Apple's command line tools (`xcode-select --install`).
 
 > [!IMPORTANT]
 > Run `make_signing_cert.sh` first and it genuinely matters. Ad-hoc signatures get a new code hash on
@@ -85,6 +94,52 @@ agreement figure it has reached, and the transport for what it has built so far.
 
 When the player cannot be identified it falls back to tapping everything making sound — and it
 **says so in the window**, because muting the other app is something only you can do.
+
+The first launch shows a six-step tour. **Help → How Mango MIDI Works** brings it back, and it is
+also Settings → **Tutorial**.
+
+### Settings
+
+Six panes in a sidebar:
+
+| Group | Panes |
+|---|---|
+| **Transcribing** | ⚙️ General · 📄 Config File · 📁 Library |
+| **App** | 🔒 Privacy · 🔽 Updates · ❓ Tutorial |
+
+**General** has *Open at login*. **Config File** is still a button to `config.json` rather than a
+wall of sliders, for the reason given there: those numbers are documented where you change them,
+and a slider would be the same setting with the explanation taken away.
+
+---
+
+## 🕶️ Privacy
+
+**Nothing leaves your Mac.** No account, no analytics, no server — there is nowhere for anything to
+go.
+
+- The transcriber runs here. Your audio is never uploaded, and there is no remote model to upload
+  it to: the whole thing is a few megabytes of CoreML inside the app.
+- A live session taps audio your Mac is already playing. What the tap hears becomes notes in
+  memory and is then discarded — never recorded to disk.
+- Your transcriptions are files in a folder you can open, and your settings are a JSON file in
+  `~/.config/mangomidi`. Updating the app touches neither.
+
+The only request Mango MIDI makes by itself is reading one small text file on GitHub to find out
+whether a newer version exists. Settings → Updates switches even that off. The same words are in
+the app, in Settings → **Privacy**.
+
+---
+
+## 🆕 What's new in 1.1.0
+
+| | |
+|---|---|
+| 🗂️ **Sidebar settings** | Six panes grouped into Transcribing / App. The three segments it replaced had no room for a sentence saying what each was for. |
+| 🚀 **Open at login** | Settings → General. |
+| ❓ **A tutorial** | Six steps, on first launch and from the Help menu. |
+| 🕶️ **A Privacy pane** | What the audio tap does, in the app rather than only in this file. |
+| 💿 **A proper installer** | The disk image opens the same drag-to-Applications window every Mango app uses. |
 
 ---
 
