@@ -1,10 +1,10 @@
 {
-  "version": "1.1.0",
-  "build": 10100,
-  "publishedAt": "2026-09-14",
+  "version": "1.1.1",
+  "build": 10101,
+  "publishedAt": "2026-09-15",
   "minimumSystemVersion": "15.0",
-  "notes": "- fix dmg name\n- sidebar settings, tutorial, privacy pane, open at login\n- updater and settings window with updates tab\n- release 1.0.0\n- fix version stamp on first release\n- merge release workflow\n- mark scripts executable\n- release workflow",
-  "downloadURL": "https://github.com/mannnnnnnngo/MangoMIDI/releases/download/v1.1.0/mango-midi-1.1.0.dmg",
-  "sha256": "162911bfda41a52f6810832240257a52533e50fa4fd40757ece3e74b233e9800",
-  "releasePage": "https://github.com/mannnnnnnngo/MangoMIDI/releases/tag/v1.1.0"
+  "notes": "update checks are now instant",
+  "downloadURL": "https://github.com/mannnnnnnngo/MangoMIDI/releases/download/v1.1.1/mango-midi-1.1.1.dmg",
+  "sha256": "7196d125a77167a437deb86bd4d6ecbed5e0b95e7871d9ddfa8b6972a03778e2",
+  "releasePage": "https://github.com/mannnnnnnngo/MangoMIDI/releases/tag/v1.1.1"
 }
