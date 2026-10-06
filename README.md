@@ -32,7 +32,7 @@ Made by Mingyu 🧑‍💻
 | --- | --- | --- |
 | [🎹 What it does](#-what-it-does) | [📥 Install](#-install) | [👀 Using it](#-using-it) |
 | [📊 How accurate](#-how-accurate) | [🎼 Chords](#-chords) | [⌨️ The command line](#️-the-command-line) |
-| [🤝 DynamicMango](#-handing-scores-to-dynamicmango) | [🕶️ Privacy](#️-privacy) | [🆕 What's new in 2.0.0](#-whats-new-in-200) |
+| [🤝 DynamicMango](#-handing-scores-to-dynamicmango) | [🕶️ Privacy](#️-privacy) | [🆕 What's new](#-whats-new-in-210) |
 | [⚖️ Licence](#️-licence) | | |
 
 ---
@@ -49,7 +49,7 @@ Made by Mingyu 🧑‍💻
 
 ## 📥 Install
 
-Download **`mango-midi-2.0.0.dmg`** from the
+Download **`mango-midi-2.1.0.dmg`** from the
 [latest release](https://github.com/mannnnnnnngo/MangoMIDI/releases/latest), drag the mango onto
 Applications, then **right-click Mango MIDI → Open** the first time (the app isn't signed with a paid
 Apple developer account; right-click → Open is Apple's own way past the warning). macOS 15+.
@@ -84,15 +84,31 @@ notes played, ~30,000 notes — scored with mir_eval's standard note metric (rig
 | | precision | recall | **F1** |
 |---|---|---|---|
 | Mango MIDI 1.x (basic-pitch + search) | 72.3% | 66.2% | 67.9% |
-| **Mango MIDI 2.0 (Transkun v2)** | **99.6%** | **97.5%** | **98.5%** |
+| Mango MIDI 2.0 (Transkun v2) | 99.6% | 97.5% | 98.5% |
+| **Mango MIDI 2.1 (retrained for dense music)** | **99.8%** | **97.2%** | **98.4%** |
 
-And on harder audio — the same pieces, degraded:
+### 🔥 Hard songs (Rush E and friends)
+
+Ten minutes of Rush E-style music — hammered repeated notes, 10-20-note chords in both hands,
+runs at 30+ notes a second, clusters; **49 notes a second on average** — generated from MIDI so every
+note is known, and played on three sampled pianos. The third piano was never used in training.
+
+| | 2.0 | **2.1** |
+|---|---|---|
+| piano 1 | 77.5% | **94.1%** |
+| piano 2 | 78.1% | **93.7%** |
+| piano 3 (never heard in training) | 77.0% | **93.5%** |
+
+2.1 retrained the model on 30 hours of music like this, mixed with real concert recordings so it
+did not forget how a normal piano piece goes.
+
+And on harder audio — the same concert pieces, degraded:
 
 | condition | F1 |
 |---|---|
 | 128 kbps MP3 | 98.5% |
 | big reverberant room | 98.2% |
-| a different, sampled piano | 98.6% |
+| a different, sampled piano | 99.1% |
 
 > [!NOTE]
 > **Why not 100%?** Nothing transcribes real recordings perfectly. What it still misses are mostly
@@ -154,7 +170,13 @@ whether a newer version exists. Settings → Updates switches even that off.
 
 ---
 
-## 🆕 What's new in 2.0.0
+## 🆕 What's new in 2.1.0
+
+| | |
+|---|---|
+| 🔥 **Hard songs** | Retrained for dense, fast, impossible-to-play music: Rush E-style pieces went from 77% to **94%** of notes. |
+
+### 2.0.0
 
 | | |
 |---|---|
@@ -174,7 +196,7 @@ Mango MIDI is **free to use** but **not open source** — the source is not publ
 are in [`LICENSE`](LICENSE).
 
 The transcription model is [Transkun](https://github.com/Yujia-Yan/Transkun) v2 by Yujia Yan, used
-under the MIT licence, which ships inside the app.
+under the MIT licence, retrained for Mango MIDI, and it ships inside the app.
 
 Copyright © 2026 Mingyu. All rights reserved.
 
