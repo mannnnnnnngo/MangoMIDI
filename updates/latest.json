@@ -1,10 +1,10 @@
 {
-  "version": "2.0.0",
-  "build": 20000,
+  "version": "2.1.0",
+  "build": 20100,
   "publishedAt": "2026-10-06",
   "minimumSystemVersion": "15.0",
-  "notes": "New transcriber (Transkun v2): finds 98.5% of notes on real recordings, up from 68%, and chords come through as chords. Convert a File is now the main screen. Listen to What's Playing starts with a 3-2-1 countdown you can cancel. When it's done it asks where to save the MIDI, which now carries velocities and the sustain pedal.",
-  "downloadURL": "https://github.com/mannnnnnnngo/MangoMIDI/releases/download/v2.0.0/mango-midi-2.0.0.dmg",
-  "sha256": "41b7aed8ae4d9d89f2fe9777d0604c8302b67e87b7fad371ed4561ce151c4451",
-  "releasePage": "https://github.com/mannnnnnnngo/MangoMIDI/releases/tag/v2.0.0"
+  "notes": "Hard songs: retrained for dense, fast music like Rush E, which went from 77% to 94% of notes found (measured on Rush E-style pieces, including on a piano it never trained on). Normal piano is unchanged at about 98.4%.",
+  "downloadURL": "https://github.com/mannnnnnnngo/MangoMIDI/releases/download/v2.1.0/mango-midi-2.1.0.dmg",
+  "sha256": "90dcfb1f686049bb8e805872517ff3eba42ead800f2fddf8f4204b65739d4035",
+  "releasePage": "https://github.com/mannnnnnnngo/MangoMIDI/releases/tag/v2.1.0"
 }
